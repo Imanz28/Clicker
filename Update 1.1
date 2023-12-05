@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Clicker Game</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #score {
+            font-size: 24px;
+            color: #333;
+        }
+        #achievements {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #007BFF;
+        }
+        #shop {
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            display: none; /* Hide the shop by default */
+        }
+    </style>
+</head>
+<body>
+    <a href="https://www.youtube.com/watch?v=xm3YgoEiEDc" target="_blank">
+        <div style="width: 10px; height: 10px; background-color: blue; position: fixed; top: 0; right: 0;"></div>
+    </a>
+
+    <button style="background-color: #4CAF50; color: white;" onclick="clickMe()">Click me!</button>
+    <p id="score">Score: 0</p>
+    <p id="pointsPerClick">Points per click: 1</p>
+    <p id="autoclickerCount">Autoclickers: 0</p>
+    <p id="prestigePoints">Prestige Points: 0</p>
+
+    <button style="background-color: #17a2b8; color: white;" onclick="toggleShop()">Shop</button>
+
+    <div id="shop">
+        <h2>Shop</h2>
+        <button style="background-color: #007BFF; color: white;" onclick="buyUpgrade()">Buy Upgrade (Cost: <span id="upgradeCost">100</span>)</button>
+        <button style="background-color: #FFC107; color: white;" onclick="buyAutoclicker()">Buy Autoclicker (Cost: <span id="autoclickerCost">100</span>)</button>
+        <button style="background-color: #dc3545; color: white;" onclick="buyPrestige()">Buy Prestige (Cost: <span id="prestigeCost">1000</span>)</button>
+    </div>
+
+    <p id="achievements">Achievements:</p>
+
+    <script>
+        var score = 0;
+        var upgradeCost = 100;
+        var autoclickerCost = 100;
+        var prestigeCost = 1000;
+        var autoclickers = 0;
+        var prestigePoints = 0;
+        var achievements = [1, 5, 10, 20, 50, 100];
+        var clickMultiplier = 1;
+
+        var autoclickerIntervals = [];
+
+        function clickMe() {
+            score += clickMultiplier;
+            document.getElementById("score").innerHTML = "Score: " + score;
+        }
+
+        function checkAchievements() {
+            for(var i=0; i<achievements.length; i++) {
+                if(prestigePoints >= achievements[i]) {
+                    document.getElementById("achievements").innerHTML += "Achieved " + achievements[i] + " prestige points! ";
+                    achievements.splice(i, 1); // Remove the achieved point from the array
+                }
+            }
+        }
+
+        function buyUpgrade() {
+            if(score >= upgradeCost) {
+                score -= upgradeCost;
+                upgradeCost += 10;
+                clickMultiplier *= 2; // Double the points per click
+                document.getElementById("score").innerHTML = "Score: " + score;
+                document.getElementById("upgradeCost").innerHTML = upgradeCost;
+                document.getElementById("pointsPerClick").innerHTML = "Points per click: " + clickMultiplier; // Update points per click
+                checkAchievements();
+            }
+        }
+
+        function buyAutoclicker() {
+            if(score >= autoclickerCost) {
+                score -= autoclickerCost;
+                autoclickers++;
+                autoclickerCost += 10;
+                document.getElementById("score").innerHTML = "Score: " + score;
+                document.getElementById("autoclickerCost").innerHTML = autoclickerCost;
+                document.getElementById("autoclickerCount").innerHTML = "Autoclickers: " + autoclickers; // Update autoclicker count
+
+                var intervalId = setInterval(clickMe, 1000);
+                autoclickerIntervals.push(intervalId);
+                checkAchievements();
+            }
+        }
+
+        function buyPrestige() {
+            if(score >= prestigeCost) {
+                score = 0; // Reset score
+                clickMultiplier = 1; // Reset points per click to 1
+                upgradeCost = 100; // Reset upgrade cost
+                autoclickerCost = 100; // Reset autoclicker cost
+                prestigeCost *= 2; // Double the cost of prestige points
+                prestigePoints++; // Increase the number of prestige points
+                document.getElementById("score").innerHTML = "Score: " + score;
+                document.getElementById("prestigePoints").innerHTML = "Prestige Points: " + prestigePoints; // Update prestige points
+
+                // Reset autoclickers
+                for(var i=0; i<autoclickerIntervals.length; i++) {
+                    clearInterval(autoclickerIntervals[i]);
+                }
+                autoclickers = 0;
+                document.getElementById("autoclickerCount").innerHTML = "Autoclickers: " + autoclickers; // Update autoclicker count
+
+                document.getElementById("upgradeCost").innerHTML = upgradeCost;
+                document.getElementById("autoclickerCost").innerHTML = autoclickerCost;
+                document.getElementById("prestigeCost").innerHTML = prestigeCost;
+                
+                document.getElementById("pointsPerClick").innerHTML = "Points per click: " + clickMultiplier; // Update points per click
+
+                checkAchievements();
+            }
+        }
+
+        function toggleShop() {
+            var shopDiv = document.getElementById("shop");
+            if (shopDiv.style.display === "none") {
+                shopDiv.style.display = "block";
+            } else {
+                shopDiv.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
